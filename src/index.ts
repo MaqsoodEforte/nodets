@@ -1,15 +1,32 @@
 import express from "express";
 import path from "path";
 const app = express();
-const port = 4000; // default port to listen
+const port = process.env.port || 4000; // default port to listen
 import bodyParser from 'body-parser'
+import fileRouter from "./routes/fileroute"
+import dotenv from "dotenv"
+import mongoose from 'mongoose'
+dotenv.config()
 
-// define a route handler for the default home page
+
+mongoose.connect(process.env.DB,
+    {useNewUrlParser:true,useUnifiedTopology:true})
+   .then(()=>console.log('mongodb connected'))
+   .catch((err:any)=>console.log('error =>', err.message));
+
 
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 //  parse application/json
 app.use(bodyParser.json())
+
+app.use("/fileRoute",fileRouter)
+
+app.get("/check",(req,res)=>{
+    res.send("data")
+})
 
 app.get( "/", ( req, res ) => {
     let name:string = req.body.name
